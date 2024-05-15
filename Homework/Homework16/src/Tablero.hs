@@ -1,14 +1,18 @@
-module Tablero (Tablero,tableroVacio, colocarEnTablero, testEnTablero, printTablero, Ficha(..)) where
+{-# LANGUAGE InstanceSigs #-}
+module Tablero (Tablero,tableroVacio, colocarEnTablero, testEnTablero, printTablero, Ficha(..), Casilla(..)) where
 
 data Ficha = X | O deriving (Show)
 data Casilla = Vacio | Ocupada Ficha
 
 instance Show Casilla where
-    show Vacio = "vacia"
+    show :: Casilla -> String
+    show Vacio = " "
     show (Ocupada ficha) = show ficha
 
 type Fila = (Casilla, Casilla, Casilla)
 type Tablero = (Fila, Fila, Fila)
+
+type Coordenada = (Int, Int)
 
 filaVacia :: Fila
 filaVacia = (Vacio, Vacio, Vacio)
@@ -16,7 +20,7 @@ filaVacia = (Vacio, Vacio, Vacio)
 tableroVacio :: Tablero
 tableroVacio = (filaVacia, filaVacia, filaVacia)
 
-colocarEnTablero :: (Int, Int) -> Ficha -> Tablero -> Tablero
+colocarEnTablero :: Coordenada -> Ficha -> Tablero -> Tablero
 colocarEnTablero cord ficha (f1, f2, f3) =
     case cord of
         (1, a) -> (colocarEnFila a ficha f1, f2, f3)
@@ -36,12 +40,12 @@ colocarEnCasilla :: Ficha -> Casilla -> Casilla
 colocarEnCasilla ficha Vacio = Ocupada ficha
 colocarEnCasilla _ casillaOcupada = casillaOcupada
 
-testEnTablero :: (Int, Int) -> Tablero -> Bool
+testEnTablero :: Coordenada -> Tablero -> Bool
 testEnTablero cord (f1, f2, f3) =
     case cord of
-        (1, a) -> testEnFila a f1
-        (2, a) -> testEnFila a f2
-        (3, a) -> testEnFila a f3
+        (1, col) -> testEnFila col f1
+        (2, col) -> testEnFila col f2
+        (3, col) -> testEnFila col f3
         _ -> False
 
 testEnFila :: Int -> Fila -> Bool
@@ -58,10 +62,17 @@ testEnCasilla casillaOcupada = False
 
 printTablero :: Tablero -> IO ()
 printTablero (f1, f2, f3) = do
-    printFila f1
-    printFila f2
-    printFila f3
+    putStrLn "    1   2   3 "
+    putStrLn "  ┌───┬───┬───┐ "
+    printFila 1 f1
+    putStrLn "  ├───┼───┼───┤ "
+    printFila 2 f2
+    putStrLn "  ├───┼───┼───┤ "
+    printFila 3 f3
+    putStrLn "  └───┴───┴───┘ "
 
-printFila :: Fila -> IO ()
-printFila (c1, c2, c3) = do
-    putStrLn $ "\t"++ show c1 ++ "\t"++ show c2 ++ "\t"++ show c3 
+printFila :: Int -> Fila -> IO ()
+printFila n (c1, c2, c3) = do
+    putStr $ show n ++ " "
+    putStr $ "│ " ++ show c1 ++ " │ " ++ show c2 ++ " │ " ++ show c3 ++ " │ "
+    putStrLn ""
