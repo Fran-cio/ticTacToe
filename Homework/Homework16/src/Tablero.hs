@@ -58,21 +58,22 @@ testEnFila fila (c1, c2, c3) =
 
 testEnCasilla ::  Casilla -> Bool
 testEnCasilla Vacio = True
-testEnCasilla casillaOcupada = False
+testEnCasilla _ = False
 
 printTablero :: Tablero -> IO ()
 printTablero (f1, f2, f3) = do
-    putStrLn "    1   2   3 "
-    putStrLn "  ┌───┬───┬───┐ "
+    putStrLn "\t    1   2   3 "
+    putStrLn "\t  ┌───┬───┬───┐ "
     printFila 1 f1
-    putStrLn "  ├───┼───┼───┤ "
+    putStrLn "\t  ├───┼───┼───┤ "
     printFila 2 f2
-    putStrLn "  ├───┼───┼───┤ "
+    putStrLn "\t  ├───┼───┼───┤ "
     printFila 3 f3
-    putStrLn "  └───┴───┴───┘ "
+    putStrLn "\t  └───┴───┴───┘ "
+    putStrLn "────────────────────────────────────"
 
 printFila :: Int -> Fila -> IO ()
 printFila n (c1, c2, c3) = do
-    putStr $ show n ++ " "
+    putStr $ "\t" ++ show n ++ " "
     putStr $ "│ " ++ show c1 ++ " │ " ++ show c2 ++ " │ " ++ show c3 ++ " │ "
     putStrLn ""

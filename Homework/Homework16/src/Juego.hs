@@ -3,7 +3,12 @@ module Juego (jugar) where
 import Tablero (Casilla (..), Ficha (..), Tablero, colocarEnTablero, printTablero, tableroVacio, testEnTablero)
 import System.Random (randomRIO)
 
-data Estado = Terminado | EnCurso
+data Estado = Terminado String | EnCurso
+
+instance Semigroup Estado where
+    EnCurso <> e = e
+    e <> EnCurso = e
+    Terminado s1 <> Terminado s2 = Terminado (s1 ++ ", " ++ s2)
 
 type Partida = (Tablero, Estado)
 
@@ -20,7 +25,9 @@ jugar playerNum = do
         _ -> return ()
 
 juegaSolo :: Partida -> IO ()
-juegaSolo (_, Terminado) = return ()
+juegaSolo (_, Terminado a) =do
+  putStrLn a
+  return ()
 juegaSolo (tab, EnCurso) = do
     putStrLn "Juega Juegador con X"
     (newtab, est) <- hacerMov (tab, EnCurso) X
@@ -33,7 +40,7 @@ juegaSolo (tab, EnCurso) = do
 
 
 hacerMovIA :: Partida -> Ficha -> IO Partida
-hacerMovIA (tab, Terminado) _ = return (tab, Terminado)
+hacerMovIA (tab, Terminado a) _ = return (tab, Terminado a)
 hacerMovIA (tab, est) ficha = do
     columna <- randomRIO (1, 3)
     fila <- randomRIO (1, 3)
@@ -47,7 +54,9 @@ hacerMovIA (tab, est) ficha = do
 
 
 juegaAcom :: Partida -> IO ()
-juegaAcom (_, Terminado) = return ()
+juegaAcom (_, Terminado a) = do
+  putStrLn a
+  return ()
 juegaAcom (tab, EnCurso) = do
     putStrLn "Juega player X"
     (newtab, est) <- hacerMov (tab, EnCurso) X
@@ -60,7 +69,7 @@ juegaAcom (tab, EnCurso) = do
 
 
 hacerMov :: Partida -> Ficha -> IO Partida
-hacerMov (tab, Terminado) _ = return (tab, Terminado)
+hacerMov (tab, Terminado a) _ = return (tab, Terminado a)
 hacerMov (tab, est) ficha = do
     putStrLn "En que columna colocas tu pieza"
     columna <- getNum
@@ -82,30 +91,22 @@ getNum = do
     if num == "1" || num == "2" || num == "3" then return (read num :: Int) else getNum
 
 finDePartida :: Tablero -> Estado
-finDePartida tab
-    | algunaDiag tab || algunaFila tab || algunaCol tab || checkEmpate tab = Terminado
-    | otherwise = EnCurso
+finDePartida tab = algunaDiag tab <> algunaFila tab <> algunaCol tab <> checkEmpate tab
 
-algunaCol :: Tablero -> Bool
-algunaCol ((c11, c21, c31), (c12, c22, c32), (c13, c23, c33)) = checkTriple [c11, c12, c13] || checkTriple [c21, c22, c23] || checkTriple [c31, c32, c33]
+algunaCol :: Tablero -> Estado
+algunaCol ((c11, c21, c31), (c12, c22, c32), (c13, c23, c33)) = checkTriple [c11, c12, c13] <> checkTriple [c21, c22, c23] <> checkTriple [c31, c32, c33]
 
-algunaFila :: Tablero -> Bool
-algunaFila ((f11, f12, f13), (f21, f22, f23), (f31, f32, f33)) = checkTriple [f11, f12, f13] || checkTriple [f21, f22, f23] || checkTriple [f31, f32, f33]
+algunaFila :: Tablero -> Estado
+algunaFila ((f11, f12, f13), (f21, f22, f23), (f31, f32, f33)) = checkTriple [f11, f12, f13] <> checkTriple [f21, f22, f23] <> checkTriple [f31, f32, f33]
 
-algunaDiag :: Tablero -> Bool
-algunaDiag ((d11, _, d21), (_, d12_22, _), (d23, _, d13)) = checkTriple [d11, d12_22, d13] || checkTriple [d21, d12_22, d23]
+algunaDiag :: Tablero -> Estado
+algunaDiag ((d11, _, d21), (_, d12_22, _), (d23, _, d13)) = checkTriple [d11, d12_22, d13] <> checkTriple [d21, d12_22, d23]
 
-checkTriple :: [Casilla] -> Bool
-checkTriple [Ocupada X, Ocupada X, Ocupada X] = True
-    -- putStrLn "El ganador es X"
-    -- return True
-checkTriple [Ocupada O, Ocupada O, Ocupada O] = True
-    -- putStrLn "El ganador es O"
-    -- return True
-checkTriple _ = False
+checkTriple :: [Casilla] -> Estado
+checkTriple [Ocupada X, Ocupada X, Ocupada X] = Terminado "El ganador es X"
+checkTriple [Ocupada O, Ocupada O, Ocupada O] = Terminado "El ganador es O"
+checkTriple _ = EnCurso
 
-checkEmpate :: Tablero -> Bool
-checkEmpate ((Ocupada _, Ocupada _, Ocupada _), (Ocupada _, Ocupada _, Ocupada _), (Ocupada _, Ocupada _, Ocupada _)) = True
-    -- putStrLn "Resulta en Empate"
-    -- return True
-checkEmpate _ = False
+checkEmpate :: Tablero -> Estado
+checkEmpate ((Ocupada _, Ocupada _, Ocupada _), (Ocupada _, Ocupada _, Ocupada _), (Ocupada _, Ocupada _, Ocupada _)) = Terminado "La partida termino en Empate"
+checkEmpate _ = EnCurso
