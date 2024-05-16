@@ -3,7 +3,7 @@ name:               Homework16
 version:            0.1.0.0
 synopsis:           Tik Tak Toe
 description:        Tik Tak Toe game made ir for the Homework 16 of the Haskell Course
-license:            MIT
+license:            Beerware
 license-file:       LICENSE
 author:             Francisco Ciordia
 maintainer:         gatupancho@gmail.com

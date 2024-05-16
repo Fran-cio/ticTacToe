@@ -29,10 +29,10 @@ juegaSolo (_, Terminado a) =do
   putStrLn a
   return ()
 juegaSolo (tab, EnCurso) = do
-    putStrLn "Juega Juegador con X"
+    putStrLn "Player with X plays."
     (newtab, est) <- hacerMov (tab, EnCurso) X
     printTablero newtab
-    putStrLn "Juega IA con O"
+    putStrLn "The AI plays with O."
     (lasttab, lastest) <- hacerMovIA (newtab, est) O
     printTablero lasttab
     juegaSolo (lasttab, lastest)
@@ -58,10 +58,10 @@ juegaAcom (_, Terminado a) = do
   putStrLn a
   return ()
 juegaAcom (tab, EnCurso) = do
-    putStrLn "Juega player X"
+    putStrLn "Player with X plays."
     (newtab, est) <- hacerMov (tab, EnCurso) X
     printTablero newtab
-    putStrLn "Juega player O"
+    putStrLn "Player with O plays."
     (lasttab, lastest) <- hacerMov (newtab, est) O
     printTablero lasttab
     juegaAcom (lasttab, lastest)
@@ -71,9 +71,9 @@ juegaAcom (tab, EnCurso) = do
 hacerMov :: Partida -> Ficha -> IO Partida
 hacerMov (tab, Terminado a) _ = return (tab, Terminado a)
 hacerMov (tab, est) ficha = do
-    putStrLn "En que columna colocas tu pieza"
+    putStrLn "Which column do you place your piece in?"
     columna <- getNum
-    putStrLn "En que fila colocas tu pieza"
+    putStrLn "Which row do you place your piece in?"
     fila <- getNum
     let cord = (fila, columna)
     let valid = testEnTablero cord tab
@@ -81,12 +81,12 @@ hacerMov (tab, est) ficha = do
       let newTab =colocarEnTablero cord ficha tab
       return (newTab, finDePartida newTab)
     else do
-     putStrLn "Esa casilla esta ocupada"
+     putStrLn "That square is already occupied."
      hacerMov (tab, est) ficha
 
 getNum :: IO Int
 getNum = do
-    putStrLn "Ingrese numero entre 1 y 3"
+    putStrLn "Enter a number between 1 and 3."
     num <- getLine
     if num == "1" || num == "2" || num == "3" then return (read num :: Int) else getNum
 
@@ -103,10 +103,10 @@ algunaDiag :: Tablero -> Estado
 algunaDiag ((d11, _, d21), (_, d12_22, _), (d23, _, d13)) = checkTriple [d11, d12_22, d13] <> checkTriple [d21, d12_22, d23]
 
 checkTriple :: [Casilla] -> Estado
-checkTriple [Ocupada X, Ocupada X, Ocupada X] = Terminado "El ganador es X"
-checkTriple [Ocupada O, Ocupada O, Ocupada O] = Terminado "El ganador es O"
+checkTriple [Ocupada X, Ocupada X, Ocupada X] = Terminado "The winner is X"
+checkTriple [Ocupada O, Ocupada O, Ocupada O] = Terminado "The winner is O"
 checkTriple _ = EnCurso
 
 checkEmpate :: Tablero -> Estado
-checkEmpate ((Ocupada _, Ocupada _, Ocupada _), (Ocupada _, Ocupada _, Ocupada _), (Ocupada _, Ocupada _, Ocupada _)) = Terminado "La partida termino en Empate"
+checkEmpate ((Ocupada _, Ocupada _, Ocupada _), (Ocupada _, Ocupada _, Ocupada _), (Ocupada _, Ocupada _, Ocupada _)) = Terminado "The game ended in a draw."
 checkEmpate _ = EnCurso
