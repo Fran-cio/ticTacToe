@@ -42,7 +42,7 @@
     <a href="https://github.com/Fran-cio/ticTacToe"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/Fran-cio/ticTacToe/ticTacToe">View Demo</a>
+    <a href="https://github.com/Fran-cio/ticTacToe">View Demo</a>
     ·
     <a href="https://github.com/Fran-cio/ticTacToe/issues">Report Bug</a>
     ·
